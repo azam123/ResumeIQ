@@ -1,73 +1,111 @@
-# 🚀 ResumeIQ
+# ResumeIQ
 
-**ResumeIQ** is an AI-powered agent that intelligently analyzes resumes against job descriptions, generates optimized resumes, and calculates a job matching score to improve hiring success.
+ResumeIQ is a production-style FastAPI backend that uses an AI-agent orchestration flow (powered by Claude via Anthropic API) to:
 
-Built using Claude models, ResumeIQ automates resume tailoring, helping candidates align their profiles with job requirements efficiently.
+- Compare a resume against a job description
+- Produce a match score (0-100)
+- Rewrite and optimize resume content
+- Return missing skills and suggestions
+- Export ATS-structured output to PDF and DOCX
 
----
+## Architecture (Layered)
 
-## 🧠 Problem Statement
+1. **API Layer** (`app/api`)  
+   FastAPI endpoints, request validation, HTTP error mapping.
+2. **Agent Layer** (`app/agents`)  
+   Orchestrates parse -> AI optimize -> deterministic+AI scoring -> export.
+3. **Service Layer** (`app/services`)  
+   Claude integration and parsing/skill extraction logic.
+4. **Scoring Engine** (`app/scoring`)  
+   Hybrid deterministic + AI-aware scoring.
+5. **Export Layer** (`app/exporters`)  
+   ATS resume export to PDF/DOCX.
+6. **Core Layer** (`app/core`)  
+   Configuration, environment management, and logging.
 
-Job seekers often struggle to:
-- Tailor resumes for each job application
-- Identify skill gaps
-- Understand how well their resume matches a job description
+## Project Structure
 
-Manual optimization is time-consuming and inconsistent.
+```text
+ResumeIQ/
+├── app/
+│   ├── agents/
+│   │   └── resume_agent.py
+│   ├── api/
+│   │   ├── deps.py
+│   │   └── v1/resume.py
+│   ├── core/
+│   │   ├── config.py
+│   │   └── logging.py
+│   ├── exporters/
+│   │   ├── docx_exporter.py
+│   │   └── pdf_exporter.py
+│   ├── models/
+│   │   └── schemas.py
+│   ├── scoring/
+│   │   └── engine.py
+│   ├── services/
+│   │   ├── claude_service.py
+│   │   └── parsing_service.py
+│   └── main.py
+├── tests/
+│   └── test_scoring_engine.py
+├── pyproject.toml
+└── README.md
+```
 
----
+## Setup
 
-## 💡 Solution
+### 1) Create environment
 
-ResumeIQ solves this by:
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
 
-1. 📄 Analyzing existing resumes
-2. 📌 Comparing them with job descriptions
-3. ✍️ Generating optimized resumes tailored for specific roles
-4. 📊 Calculating a job match score
-5. 📥 Exporting resumes in **Word/PDF formats**
+### 2) Configure environment variables
 
----
+Create `.env`:
 
-## ⚙️ Key Features
+```bash
+ANTHROPIC_API_KEY=your_api_key_here
+ANTHROPIC_MODEL=claude-3-7-sonnet-20250219
+ANTHROPIC_BASE_URL=https://api.anthropic.com
+APP_NAME=ResumeIQ
+ENV=development
+```
 
-- ✅ Resume vs Job Description Matching
-- ✅ AI-Powered Resume Optimization
-- ✅ Job Match Score (0–100%)
-- ✅ Skill Gap Identification
-- ✅ ATS-Friendly Resume Generation
-- ✅ Export to Word (.docx) & PDF
-- ✅ Modular Agent Architecture
+### 3) Run API
 
----
+```bash
+uvicorn app.main:app --reload
+```
 
-## 🔄 High-Level Flow
+## API
 
-1. User uploads:
-   - Resume
-   - Job Description
+### `POST /api/v1/resume/analyze`
 
-2. System performs:
-   - Resume parsing
-   - Job description parsing
+Request:
 
-3. AI Agent:
-   - Extracts key skills & requirements
-   - Compares both inputs
-   - Identifies gaps
+```json
+{
+  "resume_text": "...",
+  "job_description": "..."
+}
+```
 
-4. Resume Generator:
-   - Rewrites resume aligned to job
-   - Improves phrasing & structure
+Response includes:
 
-5. Scoring Engine:
-   - Calculates match score
-   - Provides insights
+- `optimized_resume`
+- `match_score`
+- `missing_skills`
+- `improvement_suggestions`
+- `ats_resume`
+- `pdf_path`
+- `docx_path`
 
-6. Output:
-   - Optimized Resume (PDF/Word)
-   - Match Score Report
+## Notes
 
----
-
-## 🏗️ Project Architecture
+- Uses async HTTP client (`httpx.AsyncClient`) for Anthropic API calls.
+- Handles upstream AI errors with 502 and unknown errors with 500.
+- Uses pydantic models and settings for strong typing and config safety.
