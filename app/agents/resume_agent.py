@@ -1,6 +1,5 @@
 from pathlib import Path
 from uuid import uuid4
-
 import logging
 
 from app.exporters.docx_exporter import DocxExporter
