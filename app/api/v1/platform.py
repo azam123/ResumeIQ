@@ -6,7 +6,7 @@ these stable contracts without changing the client application.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter
@@ -75,14 +75,14 @@ async def match_resume(payload: MatchRequest) -> MatchResponse:
         matched_terms=matched,
         missing_terms=missing,
         evidence_warnings=warnings,
-        generated_at=datetime.now(timezone.utc).isoformat(),
+        generated_at=datetime.now(UTC).isoformat(),
     )
 
 
 @router.get("/jobs", response_model=list[JobRecord])
 async def list_jobs() -> list[JobRecord]:
     """Return demo records; production connectors must verify official sources."""
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     return [
         JobRecord(
             id="demo-001", title="Principal Software Engineer", company="Example Cloud",
