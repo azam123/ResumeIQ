@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 import re
 
-
 COMMON_SKILLS = {
     "python",
     "fastapi",
