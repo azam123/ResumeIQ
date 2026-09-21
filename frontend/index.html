@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ResumeIQ | Career Intelligence</title>
+  <style>
+    :root{font-family:Inter,system-ui,sans-serif;color:#eaf0ff;background:#0b1020}body{margin:0}header{padding:28px 7%;display:flex;justify-content:space-between;align-items:center}main{padding:35px 7%;max-width:1200px;margin:auto}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}.card{background:#151d35;border:1px solid #2b3859;border-radius:18px;padding:22px;box-shadow:0 12px 40px #0002}.eyebrow{color:#8faeff;text-transform:uppercase;letter-spacing:.14em;font-size:12px}h1{font-size:clamp(36px,6vw,70px);line-height:1;margin:12px 0}h2{margin-top:0}button{background:#7c5cff;color:white;border:0;padding:12px 18px;border-radius:10px;cursor:pointer;font-weight:700}textarea{width:100%;min-height:130px;background:#0d1428;color:white;border:1px solid #3b4a70;border-radius:10px;padding:12px;box-sizing:border-box;margin:8px 0 14px}.metric{font-size:38px;font-weight:800}.muted{color:#aebbd7}#result{white-space:pre-wrap;margin-top:16px}
+  </style>
+</head>
+<body>
+<header><strong>ResumeIQ</strong><span class="muted">Career Intelligence OS</span></header>
+<main>
+  <section><div class="eyebrow">Evidence-first career copilot</div><h1>Apply with clarity.<br/>Grow with evidence.</h1><p class="muted">Analyze resume-to-job fit, expose missing evidence, and plan your next career move.</p></section>
+  <section class="grid" style="margin-top:30px">
+    <div class="card"><h2>Candidate workspace</h2><div class="metric">62%</div><p class="muted">Demo profile completeness</p><button onclick="loadDashboard()">Load dashboard</button></div>
+    <div class="card"><h2>Evidence Vault</h2><p class="muted">Store confirmed achievements, projects, architecture decisions, and portfolio proof.</p><button onclick="alert('Evidence workflow placeholder: connect storage and authentication in production.')">Add evidence</button></div>
+    <div class="card"><h2>Recruiter workspace</h2><p class="muted">Review structured candidate evidence and job requirements with human oversight.</p><button onclick="alert('Recruiter workspace scaffold: implement organization permissions before launch.')">Open demo</button></div>
+  </section>
+  <section class="card" style="margin-top:24px"><h2>Explainable job matching</h2><label>Resume text</label><textarea id="resume">Principal engineer with Azure, .NET, microservices, Kafka and GenAI experience.</textarea><label>Job description</label><textarea id="job">Looking for a Principal Engineer with Azure, .NET, Kubernetes, Kafka, system design and GenAI experience.</textarea><button onclick="match()">Analyze match</button><div id="result" class="muted"></div></section>
+</main>
+<script>
+async function match(){const result=document.getElementById('result');result.textContent='Analyzing…';try{const r=await fetch('/api/v1/platform/match',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:document.getElementById('resume').value,job_description:document.getElementById('job').value})});result.textContent=JSON.stringify(await r.json(),null,2)}catch(e){result.textContent='API unavailable. Run FastAPI and configure the frontend proxy.'}}
+async function loadDashboard(){const r=await fetch('/api/v1/platform/dashboard');alert(JSON.stringify(await r.json(),null,2))}
+</script>
+</body>
+</html>
