@@ -3,25 +3,238 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="ResumeIQ career intelligence workspace" />
   <title>ResumeIQ | Career Intelligence</title>
   <style>
-    :root{font-family:Inter,system-ui,sans-serif;color:#eaf0ff;background:#0b1020}body{margin:0}header{padding:28px 7%;display:flex;justify-content:space-between;align-items:center}main{padding:35px 7%;max-width:1200px;margin:auto}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}.card{background:#151d35;border:1px solid #2b3859;border-radius:18px;padding:22px;box-shadow:0 12px 40px #0002}.eyebrow{color:#8faeff;text-transform:uppercase;letter-spacing:.14em;font-size:12px}h1{font-size:clamp(36px,6vw,70px);line-height:1;margin:12px 0}h2{margin-top:0}button{background:#7c5cff;color:white;border:0;padding:12px 18px;border-radius:10px;cursor:pointer;font-weight:700}textarea{width:100%;min-height:130px;background:#0d1428;color:white;border:1px solid #3b4a70;border-radius:10px;padding:12px;box-sizing:border-box;margin:8px 0 14px}.metric{font-size:38px;font-weight:800}.muted{color:#aebbd7}#result{white-space:pre-wrap;margin-top:16px}
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f0f3fa;
+      --text: #172033;
+      --muted: #6f7a91;
+      --border: #e4e8f1;
+      --primary: #6256e8;
+      --primary-dark: #4c40cf;
+      --success: #159570;
+      --warning: #d99022;
+      --danger: #d9536f;
+      --shadow: 0 14px 45px rgba(31, 42, 78, .08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0d1220;
+      --surface: #151d30;
+      --surface-soft: #1c263d;
+      --text: #edf1ff;
+      --muted: #a5b0ca;
+      --border: #2a3651;
+      --shadow: 0 14px 45px rgba(0, 0, 0, .2);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    button, textarea, input { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, textarea:focus-visible, input:focus-visible { outline: 3px solid rgba(98, 86, 232, .35); outline-offset: 2px; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: 252px; flex: 0 0 252px; padding: 24px 16px; background: var(--surface); border-right: 1px solid var(--border); }
+    .brand { display: flex; gap: 10px; align-items: center; padding: 0 12px 30px; font-weight: 800; font-size: 21px; }
+    .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; color: #fff; background: linear-gradient(135deg, #7d72ff, #5144d4); }
+    .nav-label { padding: 16px 12px 8px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .nav-item { display: flex; align-items: center; gap: 12px; width: 100%; margin: 4px 0; padding: 12px; border: 0; border-radius: 12px; color: var(--muted); background: transparent; text-align: left; }
+    .nav-item:hover, .nav-item.active { color: var(--primary); background: var(--surface-soft); font-weight: 700; }
+    .sidebar-footer { margin-top: 30px; padding: 16px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface-soft); }
+    .main { min-width: 0; flex: 1; padding: 26px clamp(18px, 4vw, 48px); }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-bottom: 30px; }
+    .mobile-menu { display: none; }
+    .eyebrow { color: var(--primary); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 10px; font-size: clamp(28px, 4vw, 44px); letter-spacing: -.04em; }
+    h2 { font-size: 18px; letter-spacing: -.02em; }
+    p { line-height: 1.6; }
+    .muted { color: var(--muted); }
+    .actions { display: flex; align-items: center; gap: 10px; }
+    .btn { border: 1px solid var(--border); border-radius: 11px; padding: 11px 15px; color: var(--text); background: var(--surface); font-weight: 700; }
+    .btn:hover { border-color: var(--primary); }
+    .btn-primary { color: #fff; border-color: var(--primary); background: var(--primary); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .avatar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; color: #fff; background: linear-gradient(135deg, #f09a68, #d64f88); font-weight: 800; }
+    .hero { display: flex; justify-content: space-between; gap: 22px; align-items: flex-end; margin-bottom: 26px; }
+    .hero-copy { max-width: 680px; }
+    .grid { display: grid; gap: 16px; }
+    .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .two-column { grid-template-columns: minmax(0, 1.35fr) minmax(280px, 1fr); }
+    .card { min-width: 0; padding: 22px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); box-shadow: var(--shadow); }
+    .metric-label { color: var(--muted); font-size: 13px; font-weight: 700; }
+    .metric-value { margin: 9px 0 5px; font-size: 31px; font-weight: 850; letter-spacing: -.05em; }
+    .trend { color: var(--success); font-size: 12px; font-weight: 700; }
+    .section-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .section-heading h2 { margin-bottom: 0; }
+    .progress { height: 9px; overflow: hidden; border-radius: 99px; background: var(--surface-soft); }
+    .progress > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8c7fff, var(--primary)); }
+    .score-layout { display: flex; align-items: center; gap: 24px; }
+    .score-ring { display: grid; place-items: center; width: 126px; height: 126px; flex: 0 0 126px; border-radius: 50%; background: conic-gradient(var(--primary) var(--score, 0%), var(--surface-soft) 0); }
+    .score-ring::before { display: grid; place-items: center; width: 96px; height: 96px; border-radius: 50%; background: var(--surface); content: attr(data-score) '%'; font-size: 27px; font-weight: 850; }
+    .field { display: block; margin: 13px 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+    textarea { display: block; width: 100%; min-height: 118px; resize: vertical; padding: 13px; border: 1px solid var(--border); border-radius: 12px; color: var(--text); background: var(--surface-soft); }
+    .result { margin-top: 18px; padding: 15px; border-radius: 13px; background: var(--surface-soft); }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+    .chip { padding: 6px 9px; border-radius: 999px; color: var(--primary); background: rgba(98, 86, 232, .12); font-size: 12px; font-weight: 700; }
+    .job { padding: 15px 0; border-bottom: 1px solid var(--border); }
+    .job:last-child { border-bottom: 0; padding-bottom: 0; }
+    .job-top { display: flex; justify-content: space-between; gap: 12px; }
+    .job h3 { margin-bottom: 5px; font-size: 15px; }
+    .job p { margin-bottom: 6px; font-size: 13px; }
+    .status { padding: 5px 8px; border-radius: 8px; color: var(--success); background: rgba(21, 149, 112, .12); font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .activity { display: flex; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+    .activity:last-child { border-bottom: 0; }
+    .activity-icon { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 10px; background: var(--surface-soft); }
+    .activity p { margin-bottom: 3px; font-size: 13px; }
+    .activity small { color: var(--muted); }
+    .toast { position: fixed; right: 20px; bottom: 20px; max-width: min(360px, calc(100% - 40px)); padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; color: var(--text); background: var(--surface); box-shadow: var(--shadow); }
+    .hidden { display: none !important; }
+    @media (max-width: 1100px) { .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .two-column { grid-template-columns: 1fr; } }
+    @media (max-width: 760px) {
+      .sidebar { position: fixed; z-index: 10; inset: 0 auto 0 0; transform: translateX(-105%); transition: transform .2s ease; box-shadow: var(--shadow); }
+      .sidebar.open { transform: translateX(0); }
+      .mobile-menu { display: inline-flex; }
+      .main { padding: 18px 14px; }
+      .topbar, .hero { align-items: flex-start; }
+      .hero { flex-direction: column; }
+      .topbar .muted { display: none; }
+      .metrics { gap: 10px; }
+      .card { padding: 17px; border-radius: 16px; }
+      .score-layout { align-items: flex-start; flex-direction: column; }
+    }
+    @media (max-width: 430px) { .metrics { grid-template-columns: 1fr 1fr; } .metric-value { font-size: 25px; } .actions .btn { padding: 9px 10px; } }
   </style>
 </head>
 <body>
-<header><strong>ResumeIQ</strong><span class="muted">Career Intelligence OS</span></header>
-<main>
-  <section><div class="eyebrow">Evidence-first career copilot</div><h1>Apply with clarity.<br/>Grow with evidence.</h1><p class="muted">Analyze resume-to-job fit, expose missing evidence, and plan your next career move.</p></section>
-  <section class="grid" style="margin-top:30px">
-    <div class="card"><h2>Candidate workspace</h2><div class="metric">62%</div><p class="muted">Demo profile completeness</p><button onclick="loadDashboard()">Load dashboard</button></div>
-    <div class="card"><h2>Evidence Vault</h2><p class="muted">Store confirmed achievements, projects, architecture decisions, and portfolio proof.</p><button onclick="alert('Evidence workflow placeholder: connect storage and authentication in production.')">Add evidence</button></div>
-    <div class="card"><h2>Recruiter workspace</h2><p class="muted">Review structured candidate evidence and job requirements with human oversight.</p><button onclick="alert('Recruiter workspace scaffold: implement organization permissions before launch.')">Open demo</button></div>
-  </section>
-  <section class="card" style="margin-top:24px"><h2>Explainable job matching</h2><label>Resume text</label><textarea id="resume">Principal engineer with Azure, .NET, microservices, Kafka and GenAI experience.</textarea><label>Job description</label><textarea id="job">Looking for a Principal Engineer with Azure, .NET, Kubernetes, Kafka, system design and GenAI experience.</textarea><button onclick="match()">Analyze match</button><div id="result" class="muted"></div></section>
-</main>
-<script>
-async function match(){const result=document.getElementById('result');result.textContent='Analyzing…';try{const r=await fetch('/api/v1/platform/match',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:document.getElementById('resume').value,job_description:document.getElementById('job').value})});result.textContent=JSON.stringify(await r.json(),null,2)}catch(e){result.textContent='API unavailable. Run FastAPI and configure the frontend proxy.'}}
-async function loadDashboard(){const r=await fetch('/api/v1/platform/dashboard');alert(JSON.stringify(await r.json(),null,2))}
-</script>
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+      <div class="brand"><span class="brand-mark">R</span> ResumeIQ</div>
+      <div class="nav-label">Workspace</div>
+      <button class="nav-item active" data-section="dashboard">◈ <span>Dashboard</span></button>
+      <button class="nav-item" data-section="matching">◎ <span>Resume Intelligence</span></button>
+      <button class="nav-item" data-section="jobs">⌕ <span>Job Matches</span></button>
+      <button class="nav-item" data-section="evidence">◇ <span>Evidence Vault</span></button>
+      <button class="nav-item" data-section="applications">▤ <span>Applications</span></button>
+      <div class="nav-label">Manage</div>
+      <button class="nav-item" data-section="roadmap">↗ <span>Career Roadmap</span></button>
+      <button class="nav-item" data-section="settings">⚙ <span>Settings</span></button>
+      <div class="sidebar-footer"><strong>Profile strength</strong><p class="muted" style="font-size:12px">Add measurable achievements to improve your profile.</p><div class="progress"><span style="width:62%"></span></div><small class="muted">62% complete</small></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="actions"><button class="btn mobile-menu" id="menuButton" aria-label="Open navigation">☰</button><span class="muted">Monday, September 21, 2026</span></div>
+        <div class="actions"><button class="btn" id="themeButton" aria-label="Toggle theme">☾</button><div class="avatar" aria-label="User profile">AS</div></div>
+      </header>
+
+      <section id="dashboard" class="page-section">
+        <div class="hero"><div class="hero-copy"><div class="eyebrow">Evidence-first career copilot</div><h1>Good morning, Azam 👋</h1><p class="muted">Turn your experience into stronger applications, clearer evidence, and your next career opportunity.</p></div><button class="btn btn-primary" data-section-link="matching">+ Analyze a job</button></div>
+        <div class="grid metrics" style="margin-bottom:18px">
+          <article class="card"><div class="metric-label">Profile completion</div><div class="metric-value">62%</div><div class="progress"><span style="width:62%"></span></div><div class="trend" style="margin-top:9px">↑ Build stronger evidence</div></article>
+          <article class="card"><div class="metric-label">Jobs matched</div><div class="metric-value">24</div><div class="trend">↑ 8 this week</div></article>
+          <article class="card"><div class="metric-label">Saved applications</div><div class="metric-value">12</div><div class="muted" style="font-size:12px">4 need attention</div></article>
+          <article class="card"><div class="metric-label">Evidence items</div><div class="metric-value">18</div><div class="trend">↑ 5 added recently</div></article>
+        </div>
+        <div class="grid two-column">
+          <article class="card"><div class="section-heading"><h2>Resume health</h2><span class="status">Demo insights</span></div><div class="score-layout"><div class="score-ring" style="--score:78%" data-score="78"></div><div><h3 style="margin-bottom:7px">Your profile has strong foundations</h3><p class="muted" style="font-size:13px">Improve measurable outcomes, leadership evidence, and role-specific keywords.</p><div class="chips"><span class="chip">Azure</span><span class="chip">Architecture</span><span class="chip">GenAI</span><span class="chip">Microservices</span></div></div></div></article>
+          <article class="card"><div class="section-heading"><h2>Recent activity</h2><button class="btn" data-section-link="evidence">View all</button></div><div class="activity"><div class="activity-icon">✓</div><div><p><strong>Resume profile reviewed</strong></p><small>Today · Demo activity</small></div></div><div class="activity"><div class="activity-icon">◇</div><div><p><strong>Evidence vault updated</strong></p><small>Yesterday · 3 items</small></div></div><div class="activity"><div class="activity-icon">⌕</div><div><p><strong>New role matches found</strong></p><small>2 days ago · 8 roles</small></div></div></article>
+        </div>
+        <div class="card" style="margin-top:18px"><div class="section-heading"><h2>Recommended opportunities</h2><button class="btn" data-section-link="jobs">Explore jobs</button></div><div class="job"><div class="job-top"><div><h3>Principal Software Engineer</h3><p class="muted">Example Cloud · Remote / India</p></div><span class="status">92% match</span></div><div class="chips"><span class="chip">Azure</span><span class="chip">Distributed systems</span><span class="chip">Leadership</span></div></div><div class="job"><div class="job-top"><div><h3>Solutions Architect</h3><p class="muted">Example Enterprise · Hybrid</p></div><span class="status">84% match</span></div><div class="chips"><span class="chip">Cloud architecture</span><span class="chip">APIs</span></div></div></div>
+      </section>
+
+      <section id="matching" class="page-section hidden"><div class="hero"><div><div class="eyebrow">Explainable analysis</div><h1>Resume intelligence</h1><p class="muted">Compare your experience with a target role and understand the evidence behind the result.</p></div></div><article class="card"><label class="field" for="resume">Resume text</label><textarea id="resume">Principal engineer with Azure, .NET, microservices, Kafka and GenAI experience.</textarea><label class="field" for="job">Job description</label><textarea id="job">Looking for a Principal Engineer with Azure, .NET, Kubernetes, Kafka, system design and GenAI experience.</textarea><button class="btn btn-primary" id="matchButton">Analyze match</button><div id="matchResult" class="result hidden" aria-live="polite"></div></article></section>
+
+      <section id="jobs" class="page-section hidden"><div class="hero"><div><div class="eyebrow">Opportunity discovery</div><h1>Job matches</h1><p class="muted">Explore role recommendations based on your skills and evidence.</p></div></div><article class="card"><div class="job"><div class="job-top"><div><h3>Principal Software Engineer</h3><p class="muted">Example Cloud · Remote / India</p></div><span class="status">92% match</span></div><p class="muted">Strong overlap in Azure, distributed systems, and technical leadership.</p><button class="btn" data-section-link="matching">Compare role</button></div><div class="job"><div class="job-top"><div><h3>Solutions Architect</h3><p class="muted">Example Enterprise · Hybrid</p></div><span class="status">84% match</span></div><p class="muted">Potential match for cloud integration, APIs, and architecture ownership.</p><button class="btn" data-section-link="matching">Compare role</button></div></article></section>
+
+      <section id="evidence" class="page-section hidden"><div class="hero"><div><div class="eyebrow">Proof of impact</div><h1>Evidence vault</h1><p class="muted">Organize achievements, projects, architecture decisions, and measurable outcomes.</p></div><button class="btn btn-primary" id="evidenceButton">+ Add evidence</button></div><article class="card"><div class="job"><h3>Azure document management platform</h3><p class="muted">Architecture · Cloud integration · Performance</p><span class="chip">Verified demo record</span></div><div class="job"><h3>GenAI search and RAG pipeline</h3><p class="muted">AI engineering · Retrieval · Enterprise search</p><span class="chip">Needs supporting metrics</span></div><div class="job"><h3>Microservices modernization</h3><p class="muted">Distributed systems · CI/CD · APIs</p><span class="chip">Draft evidence</span></div></article></section>
+
+      <section id="applications" class="page-section hidden"><div class="hero"><div><div class="eyebrow">Application tracking</div><h1>Applications</h1><p class="muted">Keep your opportunities organized and track the next action.</p></div></div><article class="card"><div class="job"><div class="job-top"><div><h3>Principal Software Engineer</h3><p class="muted">Example Cloud</p></div><span class="status">In progress</span></div><p class="muted">Next action: prepare architecture examples.</p></div><div class="job"><div class="job-top"><div><h3>Solutions Architect</h3><p class="muted">Example Enterprise</p></div><span class="status">Saved</span></div><p class="muted">Next action: tailor resume summary.</p></div></article></section>
+
+      <section id="roadmap" class="page-section hidden"><div class="hero"><div><div class="eyebrow">Growth plan</div><h1>Career roadmap</h1><p class="muted">Build consistent progress across architecture, AI, delivery, and communication.</p></div></div><article class="card"><h2>Next milestones</h2><div class="job"><h3>Ship one production-ready AI feature</h3><p class="muted">Define scope, add tests, deploy, and document operational readiness.</p></div><div class="job"><h3>Create three architecture case studies</h3><p class="muted">Capture context, trade-offs, scale, reliability, and measurable outcomes.</p></div><div class="job"><h3>Strengthen interview communication</h3><p class="muted">Practice concise STAR and system-design explanations.</p></div></article></section>
+
+      <section id="settings" class="page-section hidden"><div class="hero"><div><div class="eyebrow">Workspace preferences</div><h1>Settings</h1><p class="muted">Configure your local demo experience.</p></div></div><article class="card"><h2>Appearance</h2><p class="muted">Use the theme button in the top bar to switch between light and dark modes.</p><button class="btn" id="settingsThemeButton">Toggle theme</button></article></section>
+    </main>
+  </div>
+  <div id="toast" class="toast hidden" role="status"></div>
+
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+    const sections = [...document.querySelectorAll('.page-section')];
+    const navItems = [...document.querySelectorAll('.nav-item')];
+    const sidebar = $('#sidebar');
+
+    function showToast(message) {
+      const toast = $('#toast');
+      toast.textContent = message;
+      toast.classList.remove('hidden');
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.add('hidden'), 3200);
+    }
+
+    function navigate(sectionId) {
+      sections.forEach((section) => section.classList.toggle('hidden', section.id !== sectionId));
+      navItems.forEach((item) => item.classList.toggle('active', item.dataset.section === sectionId));
+      sidebar.classList.remove('open');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.addEventListener('click', (event) => {
+      const target = event.target.closest('[data-section], [data-section-link]');
+      if (!target) return;
+      navigate(target.dataset.section || target.dataset.sectionLink);
+    });
+
+    $('#menuButton').addEventListener('click', () => sidebar.classList.toggle('open'));
+
+    function toggleTheme() {
+      const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = nextTheme;
+      localStorage.setItem('resumeiq-theme', nextTheme);
+      $('#themeButton').textContent = nextTheme === 'dark' ? '☀' : '☾';
+    }
+
+    const savedTheme = localStorage.getItem('resumeiq-theme');
+    if (savedTheme === 'dark') document.documentElement.dataset.theme = 'dark';
+    $('#themeButton').addEventListener('click', toggleTheme);
+    $('#settingsThemeButton').addEventListener('click', toggleTheme);
+
+    $('#matchButton').addEventListener('click', async () => {
+      const result = $('#matchResult');
+      const button = $('#matchButton');
+      const resumeText = $('#resume').value.trim();
+      const jobDescription = $('#job').value.trim();
+      if (resumeText.length < 20 || jobDescription.length < 20) {
+        showToast('Please provide at least 20 characters in both fields.');
+        return;
+      }
+      button.disabled = true;
+      button.textContent = 'Analyzing…';
+      result.classList.remove('hidden');
+      result.textContent = 'Analyzing your resume against the target role…';
+      try {
+        const response = await fetch('/api/v1/platform/match', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resume_text: resumeText, job_description: jobDescription })
+        });
+        if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+        const data = await response.json();
+        result.innerHTML = `<strong>Match score: ${data.score}%</strong><p class="muted">Matched skills: ${data.matched_terms.join(', ') || 'None detected'}</p><p class="muted">Missing terms: ${data.missing_terms.join(', ') || 'None detected'}</p><p class="muted">${data.evidence_warnings.join(' ') || 'Review the evidence before making decisions.'}</p>`;
+      } catch (error) {
+        result.textContent = 'The API is unavailable. Start FastAPI and ensure the frontend is served through the configured backend or proxy.';
+        showToast('Unable to connect to the matching API.');
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Analyze match';
+      }
+    });
+
+    $('#evidenceButton').addEventListener('click', () => showToast('Evidence creation form will be connected to persistence and authentication in the next iteration.'));
+  </script>
 </body>
 </html>
