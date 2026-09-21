@@ -1,111 +1,104 @@
-# ResumeIQ
+# ResumeIQ — AI Career Intelligence Platform
 
-ResumeIQ is a production-style FastAPI backend that uses an AI-agent orchestration flow (powered by Claude via Anthropic API) to:
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-async-green)](https://fastapi.tiangolo.com/)
+[![Tests](https://img.shields.io/badge/tests-pytest-orange)](https://pytest.org/)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
-- Compare a resume against a job description
-- Produce a match score (0-100)
-- Rewrite and optimize resume content
-- Return missing skills and suggestions
-- Export ATS-structured output to PDF and DOCX
+**ResumeIQ** is an evidence-first career intelligence platform for candidates and recruiters. It combines resume analysis, explainable job matching, ATS diagnostics, career gap analysis, professional evidence, and job-source freshness workflows.
 
-## Architecture (Layered)
+> Scores are diagnostic signals, not hiring probabilities. Missing resume evidence is not proof that a candidate lacks a skill.
 
-1. **API Layer** (`app/api`)  
-   FastAPI endpoints, request validation, HTTP error mapping.
-2. **Agent Layer** (`app/agents`)  
-   Orchestrates parse -> AI optimize -> deterministic+AI scoring -> export.
-3. **Service Layer** (`app/services`)  
-   Claude integration and parsing/skill extraction logic.
-4. **Scoring Engine** (`app/scoring`)  
-   Hybrid deterministic + AI-aware scoring.
-5. **Export Layer** (`app/exporters`)  
-   ATS resume export to PDF/DOCX.
-6. **Core Layer** (`app/core`)  
-   Configuration, environment management, and logging.
+## Product capabilities
 
-## Project Structure
+### Candidate
+- Resume parsing and AI-assisted analysis
+- Explainable resume-to-job matching
+- ATS parsing and content diagnostics
+- Evidence Vault for verified achievements and projects
+- Career Twin and skill graph roadmap (planned)
+- Career gap and transferable-skill analysis (planned)
+- Job discovery with source URL and last-verified metadata
+- Application tracking and interview story bank (planned)
+- LinkedIn import through approved permissions or user-provided data (planned)
+
+### Recruiter
+- Organization-aware candidate workspaces (planned)
+- Consent-based candidate evidence review (planned)
+- Requisition and requirement parsing (planned)
+- Human-led shortlist workflows (planned)
+- Audit logs, access controls, and fairness review (planned)
+
+### Platform
+- Modular FastAPI backend
+- Typed Pydantic contracts
+- Deterministic explainable matching baseline
+- Responsive frontend prototype
+- PRD in `docs/PRODUCT_PRD.md`
+
+## Current repository structure
 
 ```text
 ResumeIQ/
 ├── app/
-│   ├── agents/
-│   │   └── resume_agent.py
-│   ├── api/
-│   │   ├── deps.py
-│   │   └── v1/resume.py
-│   ├── core/
-│   │   ├── config.py
-│   │   └── logging.py
-│   ├── exporters/
-│   │   ├── docx_exporter.py
-│   │   └── pdf_exporter.py
-│   ├── models/
-│   │   └── schemas.py
-│   ├── scoring/
-│   │   └── engine.py
-│   ├── services/
-│   │   ├── claude_service.py
-│   │   └── parsing_service.py
-│   └── main.py
+│   ├── agents/              # AI orchestration
+│   ├── api/v1/              # Resume and platform APIs
+│   ├── core/                # Configuration and logging
+│   ├── exporters/           # PDF/DOCX exports
+│   ├── models/              # Typed schemas
+│   ├── scoring/             # Deterministic scoring
+│   └── services/            # Parsing and provider integrations
+├── frontend/index.html      # Candidate/recruiter UI prototype
+├── docs/PRODUCT_PRD.md      # Product requirements
 ├── tests/
-│   └── test_scoring_engine.py
 ├── pyproject.toml
 └── README.md
 ```
 
-## Setup
-
-### 1) Create environment
+## Quick start
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e .
-```
-
-### 2) Configure environment variables
-
-Create `.env`:
-
-```bash
-ANTHROPIC_API_KEY=your_api_key_here
-ANTHROPIC_MODEL=claude-3-7-sonnet-20250219
-ANTHROPIC_BASE_URL=https://api.anthropic.com
-APP_NAME=ResumeIQ
-ENV=development
-```
-
-### 3) Run API
-
-```bash
+pip install -e '.[dev]'
 uvicorn app.main:app --reload
 ```
 
-## API
+Open the API documentation at `http://localhost:8000/docs`.
 
-### `POST /api/v1/resume/analyze`
+The static frontend can be served with:
 
-Request:
-
-```json
-{
-  "resume_text": "...",
-  "job_description": "..."
-}
+```bash
+python -m http.server 5173 --directory frontend
 ```
 
-Response includes:
+Configure the frontend API base URL or reverse proxy it through the FastAPI host for local integrated use.
 
-- `optimized_resume`
-- `match_score`
-- `missing_skills`
-- `improvement_suggestions`
-- `ats_resume`
-- `pdf_path`
-- `docx_path`
+## API endpoints
 
-## Notes
+| Endpoint | Purpose |
+|---|---|
+| `GET /health` | Service health |
+| `POST /api/v1/resume/analyze` | AI resume analysis |
+| `POST /api/v1/platform/match` | Explainable matching baseline |
+| `GET /api/v1/platform/jobs` | Demo job contract |
+| `GET /api/v1/platform/dashboard` | Candidate dashboard summary |
+| `POST /api/v1/platform/evidence` | Evidence contract |
 
-- Uses async HTTP client (`httpx.AsyncClient`) for Anthropic API calls.
-- Handles upstream AI errors with 502 and unknown errors with 500.
-- Uses pydantic models and settings for strong typing and config safety.
+## Production roadmap
+
+1. Add authentication and role-based access control.
+2. Add PostgreSQL persistence, migrations, object storage, and tenant isolation.
+3. Add permitted official career-site connectors and freshness verification.
+4. Add robust document extraction, evaluation datasets, and provider abstraction.
+5. Add candidate consent, deletion/export, audit logging, and encryption controls.
+6. Add recruiter workflows only after privacy, fairness, and employment compliance review.
+7. Add CI/CD, containerization, observability, security scanning, and load testing.
+
+## Search keywords
+
+`AI resume analyzer`, `resume ATS score`, `job matching`, `career intelligence`, `career copilot`, `resume optimization`, `LinkedIn optimization`, `skill gap analysis`, `job discovery`, `job verification`, `candidate dashboard`, `recruiter dashboard`, `FastAPI`, `Python`, `LLM`, `RAG`, `career twin`, `evidence vault`, `explainable AI`.
+
+## Disclaimer
+
+ResumeIQ is an assistive career tool. It does not guarantee ATS passage, recruiter attention, interviews, employment, job authenticity, or hiring outcomes. Integrations must respect provider terms, permissions, privacy requirements, and applicable law.
