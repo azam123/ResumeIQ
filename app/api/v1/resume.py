@@ -29,7 +29,7 @@ async def analyze_resume(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Upstream AI provider failed",
         ) from exc
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         logger.exception("Unexpected error during resume analysis")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
